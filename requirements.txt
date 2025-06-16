@@ -1,0 +1,12 @@
+gradio
+torch
+omegaconf
+opencv-python
+diffusers
+einops
+transformers
+rembg
+onnxruntime
+streamlit
+huggingface_hub
+gdown
