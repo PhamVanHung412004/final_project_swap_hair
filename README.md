@@ -14,6 +14,12 @@ cd final_project_swap_hair
 
 
 ### Bước 2: Cài đặt các package cần thiết
+ 
+
+```bash
+# Tạo môi trường với conda (yêu cầu Miniconda or Anaconda)
+conda create -n tên_môi_trường python=3.10
+```
 
 ```bash
 # Cài đặt các thư viện từ requirements.txt
@@ -32,8 +38,13 @@ python download_model.py
 ### Khởi động giao diện web
 
 ```bash
-# Chạy ứng dụng Streamlit
-streamlit run app.py
+# KHởi dộng server với Flask
+python api_server.py
+```
+### Test API 
+```bash
+# Sử dụng câu lệnh sau để test API
+python test_api.py
 ```
 
-Sau khi chạy lệnh trên, ứng dụng sẽ tự động mở trong trình duyệt tại địa chỉ `http://localhost:8501`
+Sau khi chạy lệnh trên, ứng dụng sẽ tự động mở trong trình duyệt tại địa chỉ: `http://localhost:8000`

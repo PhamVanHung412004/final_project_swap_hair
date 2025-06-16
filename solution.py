@@ -1,4 +1,3 @@
-import gradio as gr
 import torch
 from PIL import Image
 import numpy as np
@@ -14,11 +13,6 @@ from ref_encoder.reference_unet import ref_unet
 from utils.pipeline import StableHairPipeline
 from utils.pipeline_cn import StableDiffusionControlNetPipeline
 from rembg import remove  # pip install rembg
-
-# Set CPU optimizations
-# torch.set_num_threads(os.cpu_count())  # Use all CPU cores
-# torch.backends.quantized.engine = 'qnnpack'  # Optimize for CPU
-# os.environ['OMP_NUM_THREADS'] = str(os.cpu_count())
 
 def concatenate_images(image_files, output_file, type="pil"):
     if type == "np":
@@ -110,9 +104,9 @@ class StableHair:
             scale = float(scale)
 
             # load imgs
-            # source_image = Image.open(source_image).convert("RGB").resize((size, size))
+            source_image = Image.open(source_image).convert("RGB").resize((size, size))
             id = np.array(source_image)
-            # reference_image = np.array(Image.open(reference_image).convert("RGB").resize((size, size)))
+            reference_image = np.array(Image.open(reference_image).convert("RGB").resize((size, size)))
             source_image_bald = np.array(self.get_bald(source_image, scale=0.9))
             H, W, C = source_image_bald.shape
 
@@ -134,74 +128,6 @@ class StableHair:
                 ref_image=reference_image,
             ).samples
         return sample
-
-    
-    
-
-    # def Hair_Transfer(self,
-    #                 source_image,
-    #                 reference_image,
-    #                 random_seed,
-    #                 step,
-    #                 guidance_scale,
-    #                 scale,
-    #                 controlnet_conditioning_scale,
-    #                 size=512):
-    #     with torch.inference_mode():
-    #         # prompts & seeds
-    #         prompt = ""
-    #         n_prompt = ""
-    #         random_seed = int(random_seed)
-    #         step = int(step)
-    #         guidance_scale = float(guidance_scale)
-    #         scale = float(scale)
-
-    #         # --- load & resize source ---
-    #         source_pil = (
-    #             Image.open(source_image)
-    #             .convert("RGB")
-    #             .resize((size, size))
-    #         )
-    #         id = np.array(source_pil)
-
-    #         # --- remove background via rembg ---
-    #         bg_removed = remove(source_pil)          # may be L or RGB or RGBA
-    #         bg_removed = bg_removed.convert("RGBA")  # ensure alpha channel
-    #         white_bg = Image.new("RGBA", bg_removed.size, (255, 255, 255, 255))
-    #         composited = Image.alpha_composite(white_bg, bg_removed)
-    #         bg_rgb = composited.convert("RGB")       # back to 3-channel RGB
-
-    #         # --- prepare reference image ---
-    #         reference_np = np.array(
-    #             Image.open(reference_image)
-    #                 .convert("RGB")
-    #                 .resize((size, size))
-    #         )
-
-    #         # --- get bald mask from bg-free image ---
-    #         source_image_bald = np.array(self.get_bald(bg_rgb, scale=0.9))
-    #         H, W, C = source_image_bald.shape
-
-    #         # --- configure ControlNet and RNG ---
-    #         set_scale(self.pipeline.unet, scale)
-    #         generator = torch.Generator(device="cpu").manual_seed(random_seed)
-
-    #         # --- run your pipeline ---
-    #         sample = self.pipeline(
-    #             prompt,
-    #             negative_prompt=n_prompt,
-    #             num_inference_steps=step,
-    #             guidance_scale=guidance_scale,
-    #             width=W,
-    #             height=H,
-    #             controlnet_condition=source_image_bald,
-    #             controlnet_conditioning_scale=controlnet_conditioning_scale,
-    #             generator=generator,
-    #             reference_encoder=self.hair_encoder,
-    #             ref_image=reference_np,
-    #         ).samples
-
-    #     return id, sample, source_image_bald, reference_np
 
     def get_bald(self, id_image, scale):
         H, W = id_image.size
