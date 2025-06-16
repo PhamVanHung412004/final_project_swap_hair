@@ -1,14 +1,22 @@
+import os
+import torch
 import streamlit as st
 import cv2
 import numpy as np
 from PIL import Image
 import io
 import base64
-import torch
 from typing import Tuple
 from solution import StableHair
 from pathlib import Path
 
+import time
+from datetime import datetime
+# Set CPU optimizations
+torch.set_num_threads(os.cpu_count())  # Use all CPU cores
+torch.backends.quantized.engine = 'fbgemm'  # ✅ Hỗ trợ Windows
+# torch.backends.quantized.engine = 'qnnpack'  # Optimize for CPU
+os.environ['OMP_NUM_THREADS'] = str(os.cpu_count())
 path = str(Path(__file__).parent / "configs/hair_transfer.yaml")
 @st.cache_resource
 def load_model():
@@ -34,7 +42,7 @@ def main():
     # Create two columns for image uploads
     size = st.selectbox(
             "Size image",
-            options=[128,256,512, 768, 1024],
+            options=[512, 768, 1024],
             index=0,
             help="Chọn kích thước"
         )
@@ -163,7 +171,7 @@ def main():
                 
                 source_cv = source_image.convert("RGB").resize((int(size),int(size)))
                 target_cv = target_image.convert("RGB").resize((int(size),int(size)))
-                
+                start_time = time.time()
                 # Perform hair transfer
                 data_new = {     
                     "source_image": source_cv,
@@ -182,6 +190,7 @@ def main():
                 image_result = cv2.cvtColor(image_result, cv2.COLOR_BGR2RGB)
                 # if image_result is not None:
                 #     # Convert back to PIL format for display
+                end_time = time.time()
                 try:
                     result_pil = Image.fromarray(cv2.cvtColor(image_result, cv2.COLOR_BGR2RGB))
                     # Hiển thị kết quả
@@ -201,6 +210,7 @@ def main():
                             file_name="ket_qua_ghep_toc.png",
                             mime="image/png"
                         )
+                        st.write(f"Tổng thời gian chạy: {end_time - start_time:.2f} giây")
 
                 except Exception as e:
                     st.error(f"Lỗi chuyển đổi kết quả: {str(e)}")
