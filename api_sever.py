@@ -11,8 +11,6 @@ from pathlib import Path
 import torch
 from solution import StableHair
 import cv2
-import time
-from datetime import datetime
 
 # Set CPU optimizations
 torch.set_num_threads(os.cpu_count())  # Use all CPU cores
@@ -67,7 +65,7 @@ def save_uploaded_file(file, prefix=''):
 @app.route('/transfer-hair', methods=['POST'])
 def transfer_hair():
     try:
-        start_time = time.time()
+        
         if 'source_image' not in request.files:
             return jsonify({'error': 'Missing source_image file'}), 400
         if 'reference_image' not in request.files:
@@ -108,9 +106,6 @@ def transfer_hair():
         result_filename = f"result_{uuid.uuid4()}.png"
         result_filepath = os.path.join(RESULT_FOLDER, result_filename)
         cv2.imwrite(result_filepath, result_img)
-        print(result_filename)
-        end_time = time.time()  # End tracking
-        print(f"\nTotal execution time: {end_time - start_time:.2f} seconds")
         
         return send_file(
             result_filepath,
