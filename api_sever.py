@@ -16,8 +16,8 @@ import cv2
 torch.set_num_threads(os.cpu_count())  # Use all CPU cores
 torch.backends.quantized.engine = 'fbgemm'
 os.environ['OMP_NUM_THREADS'] = str(os.cpu_count())
-path = str(Path(__file__).parent / "configs/hair_transfer.yaml")
 
+path = str(Path(__file__).parent / "configs/hair_transfer.yaml")
 # Khởi tạo Flask app
 app = Flask(__name__)
 CORS(app)
